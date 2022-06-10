@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="arm">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.437369618941639 -0.758884809906408 0.535250201355418"
+        rpy="0 0 0" />
+      <mass
+        value="78.9325154214436" />
+      <inertia
+        ixx="4.97671356004004"
+        ixy="-3.3630163935889E-32"
+        ixz="-2.40741243048404E-32"
+        iyy="4.97671356004004"
+        iyz="2.72997989533537E-16"
+        izz="9.81796791632023" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="base">
+    <inertial>
+      <origin
+        xyz="5.55111512312578E-17 0.241827497166694 1.11022302462516E-16"
+        rpy="0 0 0" />
+      <mass
+        value="276.551709555531" />
+      <inertia
+        ixx="21.3305461598545"
+        ixy="-1.94575635394553E-15"
+        ixz="-2.1369899010415E-05"
+        iyy="35.455977984331"
+        iyz="2.11229301650297E-15"
+        izz="29.6143277041253" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm/meshes/base.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm/meshes/base.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base"
+    type="continuous">
+    <origin
+      xyz="0.437369618941639 -0.758884809906408 0.58487706702706"
+      rpy="1.5707963267949 0 -0.0454959858958344" />
+    <parent
+      link="base_link" />
+    <child
+      link="base" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="lower">
+    <inertial>
+      <origin
+        xyz="0.00250000000000017 0.75 0"
+        rpy="0 0 0" />
+      <mass
+        value="336.618325996843" />
+      <inertia
+        ixx="117.667071103716"
+        ixy="2.34721661654883E-14"
+        ixz="-2.62012633811537E-14"
+        iyy="11.7657027044023"
+        iyz="5.46436305439298E-16"
+        izz="110.783736702626" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm/meshes/lower.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm/meshes/lower.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="lower"
+    type="continuous">
+    <origin
+      xyz="0 0.4 0"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="lower" />
+    <axis
+      xyz="1 0 0" />
+  </joint>
+  <link
+    name="upper">
+    <inertial>
+      <origin
+        xyz="2.22044604925031E-16 0.718316160194336 2.22044604925031E-16"
+        rpy="0 0 0" />
+      <mass
+        value="111.106194490192" />
+      <inertia
+        ixx="17.0475501956029"
+        ixy="5.30990299731457E-15"
+        ixz="1.11022302462516E-15"
+        iyy="1.90879408023281"
+        iyz="-1.63680955458967E-16"
+        izz="17.322149032723" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm/meshes/upper.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm/meshes/upper.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="upper"
+    type="continuous">
+    <origin
+      xyz="0 1.5 0"
+      rpy="0 0 0" />
+    <parent
+      link="lower" />
+    <child
+      link="upper" />
+    <axis
+      xyz="1 0 0" />
+  </joint>
+</robot>
