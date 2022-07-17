@@ -3,10 +3,11 @@ from gym import spaces
 from gym.utils import seeding
 import mujoco_py
 import numpy as np
+from .AM_Robotics_env import AMRoboticsEnv
 
 
-class TargetBallEnv(gym.Env):
-    def __init__(self, mjcf_path):
+class TargetBallEnv(AMRoboticsEnv):
+    def __init__(self, mjcf_path, frame_skip=1, mujoco_bindings="mujoco", render_mode="human", camera=False, width=64, height=64):
         self.model = mujoco_py.load_model_from_path(mjcf_path)
         self.sim = mujoco_py.MjSim(self.model)
         self.viewer = mujoco_py.MjViewer(self.sim)
@@ -40,7 +41,7 @@ class TargetBallEnv(gym.Env):
         return self.sim.data.get_body_xpos("target")
 
     def reward(self):
-        return NotImplementedError()
+        return 0
 
     def step(self, action):
         pass

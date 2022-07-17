@@ -1,18 +1,19 @@
+import gym
+import gym_AM_Robotics
 import numpy as np
-from collections import OrderedDict
+from time import sleep
 
-obs = OrderedDict(
-    camera=np.zeros((64, 64, 3)),
-    joint_angles=np.zeros(7),
-    joint_velocities=np.zeros(7),
-)
 
-# What should happen there:
-if any(np.any(np.isnan(obs[key])) for key in obs):
-    print(any(np.any(np.isnan(obs[key])) for key in obs))
-    raise ValueError("Observation contains NaN values")
-
-print(np.any(np.isnan(obs)))
+if __name__ == "__main__":
+    env = gym.make(
+        id="AM_Robotics-v0", 
+        mjcf_path="/home/nmelgiri/AM_Robotics/AM_Robot/arm_target.xml", 
+        render_mode="rgb_array",
+        frame_skip=1,
+        contact_reward=50,
+    )
+    obs = env.reset()
+    print(env.action_space, env.observation_space)
 
 
 
