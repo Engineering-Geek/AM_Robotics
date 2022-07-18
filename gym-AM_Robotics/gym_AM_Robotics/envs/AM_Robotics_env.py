@@ -4,8 +4,8 @@ import numpy as np
 
 
 class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
-    def __init__(self, mjcf_path, frame_skip=1, mujoco_bindings="mujoco", render_mode="human", 
-                 camera=False, width=64, height=64, contact_reward= 50.0):
+    def __init__(self, mjcf_path, frame_skip=1, render_mode="human", 
+                 camera=False, width=64, height=64, contact_reward=50.0, max_steps=1000):
         self.width = width
         self.height = height
         self.camera = camera
@@ -18,16 +18,20 @@ class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.c = [-.45, .75, -.6]
         self.done = False
         self.contact_reward = contact_reward
+        self.max_steps = max_steps
+        self.i = 0
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(
             self,
             model_path=mjcf_path,
-            frame_skip=frame_skip,
-            mujoco_bindings=mujoco_bindings,
+            frame_skip=frame_skip
         )
 
     def step(self, a):
         self.do_simulation(a, self.frame_skip)
+        if self.i >= self.max_steps:
+            self.done = True
+        self.i += 1
         observation = self._get_obs()
         return observation, self.reward(), self.done, {}
 
@@ -134,6 +138,7 @@ class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         qvel = np.concatenate([arm_qvel, ball_qvel, np.zeros((3,))])
         self.set_state(qpos=qpos, qvel=qvel)
         self.done = False
+        self.i = 0
         return self._get_obs()
 
     def render(self, mode="human", camera_id=None, camera_name="camera"):
@@ -145,6 +150,9 @@ class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         joint_angles = self.data.qpos.copy().astype(float)[:3]
         joint_velocities = self.data.qvel.copy().astype(float)[:3]
         joint_accelerations = self.data.qacc.copy().astype(float)[:3]
+        tip_pos = self._get_tip_pos()
+        target_pos = self._get_target_pos()
+        target_vector = np.add(target_pos, -tip_pos)
         if self.camera:
             camera = self.render(self.render_mode).astype(float).flatten()
             observation = [
@@ -152,12 +160,14 @@ class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                 joint_angles,
                 joint_velocities,
                 joint_accelerations,
+                target_vector
             ]
         else:
             observation = [
                 joint_angles,
                 joint_velocities,
                 joint_accelerations,
+                target_vector
             ]
         return np.concatenate(observation).ravel()
     
@@ -168,7 +178,7 @@ class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def reward(self):
         # higher reward the closer the upper arm of the arm is to the ball
         distance = np.linalg.norm(self._get_target_pos() - self._get_tip_pos())
-        reward = 1 / distance
+        reward = 1 / (100 * distance)
         
         # check to see if the ball hit the upper arm, if so, end episode with increased reward
         d = self.unwrapped.data

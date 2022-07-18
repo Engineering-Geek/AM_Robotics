@@ -8,7 +8,7 @@ register(
         'frame_skip': 1,
         'width': 64,
         'height': 64,
-        'mujoco_bindings': "mujoco",
-        'contact_reward': 50
+        'contact_reward': 50,
+        'max_steps': 1000
     }
 )

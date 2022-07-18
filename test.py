@@ -1,7 +1,5 @@
 import gym
 import gym_AM_Robotics
-import numpy as np
-from time import sleep
 
 
 if __name__ == "__main__":
@@ -11,9 +9,18 @@ if __name__ == "__main__":
         render_mode="rgb_array",
         frame_skip=1,
         contact_reward=50,
+        max_steps=2000
     )
     obs = env.reset()
-    print(env.action_space, env.observation_space)
+    
+    while True:
+        # action = env.action_space.sample()
+        action = [100, 0, 0]
+        obs, reward, done, info = env.step(action)
+        print(reward)
+        env.render()
+        if done:
+            obs = env.reset()
 
 
 
