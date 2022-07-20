@@ -17,14 +17,14 @@ class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.max_vel = 8.0
         self.c = [-.45, .75, -.6]
         self.done = False
-        self.contact_reward = contact_reward
+        self.contact_reward = contact_reward[0] if isinstance(contact_reward, tuple) else contact_reward
         self.max_steps = max_steps
         self.i = 0
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(
             self,
             model_path=mjcf_path,
-            frame_skip=frame_skip
+            frame_skip=frame_skip,
         )
 
     def step(self, a):
@@ -50,17 +50,7 @@ class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return self.data.xipos[4].copy()
     
     @staticmethod
-    def polar_to_cartesian(theta: float, phi: float, r: float):
-        """Given $$\theta, \phi, r$$, return the corresponding cartesian coordinates
-
-        Args:
-            theta (float): _description_
-            phi (float): _description_
-            r (float): _description_
-
-        Returns:
-            _type_: _description_
-        """
+    def spherical_to_cartesian(theta: float, phi: float, r: float):
         return np.array([
             r * np.sin(theta) * np.cos(phi),
             r * np.sin(theta) * np.sin(phi),
@@ -68,29 +58,31 @@ class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         ])
     
     @staticmethod
+    def cartesian_to_spherical(x, y, z):
+        r = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+        theta = np.arccos(z / r)
+        phi = np.arctan2(y, x)
+        return r, theta, phi
+    
+    @staticmethod
     def distance(a: np.array, b: np.array):
         assert len(a) == len(b), "a and b are not the same length"
         return np.sqrt(sum([(a_ - b_) ** 2 for a_, b_ in zip(a, b)]))
         
     def _get_new_ball_params(self):
-        """Returns a dictionary containing new set of parameters for the ball to be tossed
-
-        Returns:
-            dict: ball spawn position, ball spawn velocity vector
-        """
         v_mag = 1e10
         while np.isnan(v_mag) or v_mag > self.max_vel:
             # target qpos (quaternion) and qvel (dx, dy, dz)
             r = np.random.rand() * (self.max_distance - self.min_distance) + self.min_distance
             theta = np.random.rand() * np.pi - np.pi / 2
             phi = np.random.rand() * 2 * np.pi
-            ball_rel_pos = self.polar_to_cartesian(theta, phi, r)
+            ball_rel_pos = self.spherical_to_cartesian(theta, phi, r)
             
             # pick a target within the range of the arm to throw it at that point (aim)
             theta1 = np.random.rand() * np.pi
             phi1 = np.random.rand() * np.pi
             r1 = np.random.rand() * self.arm_length
-            aim_pos = self.polar_to_cartesian(theta1, phi1, r1)
+            aim_pos = self.spherical_to_cartesian(theta1, phi1, r1)
             
             # pick a theta and find velocity, velocity eqn is derived from kinematic equations
             theta2 = np.random.rand() * np.pi / 4
@@ -153,22 +145,14 @@ class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         tip_pos = self._get_tip_pos()
         target_pos = self._get_target_pos()
         target_vector = np.add(target_pos, -tip_pos)
-        if self.camera:
-            camera = self.render(self.render_mode).astype(float).flatten()
-            observation = [
-                camera,
-                joint_angles,
-                joint_velocities,
-                joint_accelerations,
-                target_vector
-            ]
-        else:
-            observation = [
-                joint_angles,
-                joint_velocities,
-                joint_accelerations,
-                target_vector
-            ]
+        target_vector_spherical = self.cartesian_to_spherical(*target_vector)
+        exit
+        observation = [
+            joint_angles,
+            joint_velocities,
+            joint_accelerations,
+            target_vector_spherical
+        ]
         return np.concatenate(observation).ravel()
     
     @staticmethod
