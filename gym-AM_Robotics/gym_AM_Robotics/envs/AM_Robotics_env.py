@@ -146,7 +146,6 @@ class AMRoboticsEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         target_pos = self._get_target_pos()
         target_vector = np.add(target_pos, -tip_pos)
         target_vector_spherical = self.cartesian_to_spherical(*target_vector)
-        exit
         observation = [
             joint_angles,
             joint_velocities,
